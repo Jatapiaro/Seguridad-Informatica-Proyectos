@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>Seguridad Informática</title>
+    </h:head>
+    <h:body>
+        <h:form>
+            <p:panel id="basic" header="Proyectos - Seguridad Informática" footer="Jacobo Tapia - A01336590" style="margin-bottom:20px">
+                <h:panelGrid columns="2" cellpadding="10">
+                    <h:outputText
+                        value="Esta es una página web dedicada a los proyectos del curso de Seguridad Informática, abajo encontrarás los proyectos que se tienen aquí. De esta forma cada uno tendrá una página dedicada donde se podrá hacer uso de los mismos." />
+                </h:panelGrid>
+            </p:panel>
+            <p:accordionPanel>
+                <p:tab title="LFSR">
+                    <h:panelGrid columns="1" cellpadding="10">
+                        <p:graphicImage url="http://www.cis.upenn.edu/~cis110/12sp/hw/hw05/lfsr.png" />
+                        <h:outputText
+                            value="Simulación de un LFRS, en donde se despliega la secuencia de bits que se van generando y como se va modificando el registro de corrimiento. " />
+                        <p:panelGrid>
+                            <p:row>
+                                <p:column><p:commandButton value="Ir al proyecto" actionListener="#{indexController.showLFSRPage()}"  /></p:column>
+                                <p:column><p:commandButton value="Ver tutorial" type="button" onclick="PF('dlg1').show();"  /></p:column>
+                            </p:row>
+                        </p:panelGrid>
+                    </h:panelGrid>
+                </p:tab>  
+            </p:accordionPanel>
+            <p:dialog header="LFSR tutorial" widgetVar="dlg1" modal="true" height="520" width="1020">
+                <p:media value="https://www.youtube.com/v/JE61S0rDdqE&amp;hl=en&amp;fs=1&amp;" width="1000" height="500" player="flash"/>
+            </p:dialog>            
+        </h:form>
+    </h:body>
+</html>
+

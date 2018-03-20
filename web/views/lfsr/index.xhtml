@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>LFSR - Seguridad Informática</title>
+    </h:head>
+    
+    <style type="text/css">
+        
+        
+    .ui-diagram-element {   
+        width:1.5em; 
+        height:1.5em;     
+        line-height:2em;
+        text-align: center;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+        border-radius: 4px;
+        border: 1px solid transparent;
+        background-color: #98AFC7;
+        color: #ffffff;
+    }
+    
+    .big {
+        width:15em !important;
+        height:7.5em !important;     
+        line-height:4em !important;
+        text-align: center !important;
+        word-break: break-all;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8) !important;
+        border-radius: 4px !important;
+        border: 1px solid transparent !important;
+        background-color: #9CB071 !important;
+        color: #ffffff !important;
+    }
+    
+    
+    .ui-diagram-circle {
+        width:2.5em; 
+        height:2.5em;
+        border-radius: 100%;
+    }
+ 
+    .ui-diagram-success {
+        background-color: #9CB071;
+        color: #ffffff;
+        border-color: #7ab02c;
+    }
+ 
+    .ui-diagram-fail {
+        background-color: #C34A2C;
+        color: #ffffff;
+    }
+ 
+    .flow-label {
+        font-size: 24px;
+        font-weight: bold;
+        color: #816A51;
+    }
+    </style>
+    
+    <h:body>
+        <h:form>
+            <p:panel header="Datos de Entrada">               
+                <p:panelGrid>
+                    <p:row>
+                        <p:messages id="messages" showDetail="true" closable="true">
+                            <p:autoUpdate />
+                        </p:messages>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="binarySeed" value="Semilla en binario: "/>
+                        </p:column>
+                        <p:column>
+                            <p:inputText size="31" id="binarySeed" value="#{lfsrController.binarySeed}" required="true" label="Semilla en binario">
+                                <p:keyFilter regEx="/[0|1]/i"/>
+                                <p:ajax event="keyup" update="binarySeed simulator taps" listener="#{lfsrController.updateBinarySeed()}"/>
+                            </p:inputText>
+                        </p:column>
+                        <!--<p:column>
+                            <p:outputLabel for="seed" value="Semilla en decimal: "/>
+                        </p:column>
+                        <p:column>
+                            <p:inputText size="10" id="seed" value="#{lfsrController.seed}" label="Semilla en decimal: ">
+                                <p:ajax event="keyup" update="binarySeed seed simulator taps" listener="#{lfsrController.updateSeed()}"/>
+                                <p:keyFilter regEx="/[0|1|2|3|4|5|6|7|8|9]/"/>
+                            </p:inputText>
+                        </p:column>-->
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel value="Taps: "/>
+                        </p:column>
+                        <p:column>
+                            <p:outputLabel id="taps" value="#{lfsrController.tapsAsString()}"/>
+                        </p:column>
+                        <p:column>
+                            <p:commandButton update="results simulator control control2" value="Ejecutar" actionListener="#{lfsrController.makeProcess()}" />
+                        </p:column>
+                        <p:column>
+                            <p:commandButton update="results simulator control control2 taps" value="Reset" actionListener="#{lfsrController.reset()}" />
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </p:panel>
+            <p:panel header="Simulación">
+                <p:diagram id="simulator" value="#{lfsrController.model}" style="height:400px" styleClass="ui-widget-content">
+                    <p:ajax update="taps" event="connect" listener="#{lfsrController.onConnect}" />
+                    <p:ajax event="disconnect" listener="#{lfsrController.onDisconnect}" />
+                </p:diagram>
+                <p:panelGrid>
+                    <p:row>
+                        <p:column>
+                            <p:commandButton id="control" disabled="#{lfsrController.endProcess eq false}" update="simulator" value="Anterior" icon="ui-icon-triangle-1-w" actionListener="#{lfsrController.anterior()}"/>
+                        </p:column>
+                        <p:column>
+                            <p:commandButton update="simulator" id="control2" disabled="#{lfsrController.endProcess eq false}" value="Siguiente" icon=" ui-icon-triangle-1-e" actionListener="#{lfsrController.siguiente()}" />
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </p:panel>
+            <p:panel header="Resultados">
+                <p:dataTable id="results" var="step" value="#{lfsrController.lfsr.stepList}" rowIndexVar="i" paginator="true" rowsPerPageTemplate="#{lfsrController.rowsPerTemplate}">
+                    <p:column headerText="#">
+                        <h:outputText value="#{i}"/>
+                    </p:column>
+                    <p:column headerText="Semilla Inicial">
+                        <h:outputText value="#{step.binarySeed}"/>
+                    </p:column>
+                    <p:column headerText="Nueva Semilla">
+                        <h:outputText value="#{step.newBinarySeed}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+    </h:body>
+</html>
+
