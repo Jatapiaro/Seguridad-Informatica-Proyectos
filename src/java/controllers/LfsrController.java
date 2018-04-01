@@ -29,15 +29,39 @@ import org.primefaces.model.diagram.endpoint.EndPoint;
 import org.primefaces.model.diagram.endpoint.EndPointAnchor;
 import org.primefaces.model.diagram.endpoint.RectangleEndPoint;
 
-/**
- *
+ /*
+ * Proyectos - Seguridad Informática
+ * Autor: Jacobo Misael Tapia de la Rosa
+ * Matricula: 1336590   Carrera: ITC-11
+ * Correo Electronico: A01336590@itesm.mx
+ * Fecha de creacion: 18-mar-2018
+ * Fecha última modificiacion: 20-mar-2018
+ * Nombre Archivo: LfsrController.java
+ * Archivos relacionados: IndexController.java
+ * Ejecucion: Acceder a https://seguridad-informatica.herokuapp.com/
+ * Plataforma: Navegadores Chrome, Safari, Firefox e Internet Explorer
+ * Descripción: Programa para redirigir a la ruta necesaria
  * @author jacobotapia
  */
 @SessionScoped
 @ManagedBean
 public class LfsrController implements Serializable {
 
-    
+    /*
+    * @param String binarySeed la semilla en binario
+    * @param long seed la semilla representada como un entero, se representó con un long
+    *           para que podamos validar que no pase de Integer.MAX_VALUE
+    * @param LFSR lfsr objeto de la librería LFSR que hace el proceso del simulador
+    * @param String rowsPerTemplate número de filas que puede tener la tabla de 
+                resultados por página
+    * @param model El modelo o digrama donde hacemos la simulación
+    * @param List<Integer> connections connections la lista de conexiones que 
+                que tenemos con el xor. Es decir los taps
+    * @param boolean endProcess variable que nos indica si el lfsr ha terminado su simualación.
+    * @param List<Step> steps lista de todos los pasos de la simulación
+                la cual termina cuando se repite la semilla
+    * @param int stepIndex en que paso vamos a la hora de recorrer la simulación
+    */
     private String binarySeed;
     private long seed;
     
@@ -45,7 +69,7 @@ public class LfsrController implements Serializable {
     
     private String rowsPerTemplate = "10, 50, 100";
     
-    private DefaultDiagramModel model, auxiliarModel;
+    private DefaultDiagramModel model;
     private List<Integer> connections;
     
     private boolean endProcess = false;
@@ -53,6 +77,10 @@ public class LfsrController implements Serializable {
     private List<Step> steps;
     private int stepIndex = 0;
     
+    
+    /**
+    * Inicializa la parte visual y los elementos del simulador 
+    */
     @PostConstruct
     public void init() {
         
@@ -66,20 +94,36 @@ public class LfsrController implements Serializable {
         
     }
     
+    /**
+    * Inicia el modelo o grafo donde se mostrará
+    * la simulación.
+    */
     private void initModel() {
         
+        /*
+        * Se define el diagrama
+        * y como se va a ver asi como el tipo de conexiones que tendrá
+        */
         this.model = new DefaultDiagramModel();
         this.model.setMaxConnections(1000);
         FlowChartConnector connector = new FlowChartConnector();
         connector.setPaintStyle("{strokeStyle:'#C7B097',lineWidth:3}");
         this.model.setDefaultConnector(connector);
         
-        
+        /*
+        * Se definen las variables para mantener en una posicion definida
+        * la semilla binaria y el resultado de la simulación o de los pasos
+        * del corrimiento
+        */
         int startX = 100;
         int step = 30;
         int startY = 200;
         boolean first = true;
         int id = 0;
+        /*
+        * Para cada elemento de la semilla
+        * creamos un elemento en el grafo para poderlo conectar con el xor
+        */
         for ( char c :  this.binarySeed.toCharArray() ) {
             Element el = new Element(""+c, "5em", "1.5em");
             el.setDraggable(false);
@@ -105,7 +149,11 @@ public class LfsrController implements Serializable {
             this.model.addElement(el);
         }
         
-       
+        /*
+        * Se agrega el nodo que representa el xor
+        * y agregamos los conectores por defecto del
+        * nodo más a la derecha al xor
+        */
         Element xor = new Element("xor", "5em", "1.5em");
         xor.setDraggable(false);
         xor.setX((startX/2)+"px");
@@ -124,7 +172,10 @@ public class LfsrController implements Serializable {
         
     }
     
-    
+    /**
+    * Llamado por ajax cada vez que se actualiza la semilla
+    * De ser así, se reinician todos los parametros y taps
+    */
     public void updateSeed() {
         this.reset();
         this.connections = new ArrayList<Integer>();
@@ -134,6 +185,10 @@ public class LfsrController implements Serializable {
         this.initModel();
     }
     
+    /**
+    * Llamado por ajax cada vez que se actualiza la semilla
+    * De ser así, se reinician todos los parametros y taps
+    */
     public void updateBinarySeed() {
         this.reset();
         this.connections = new ArrayList<Integer>();
@@ -142,7 +197,12 @@ public class LfsrController implements Serializable {
         this.initModel();
     }
     
+    /**
+    * Llamado cuando se presiona el botón de procesar
+    */
     public void makeProcess() {
+        //En caso de tener una semilla vacia o taps vacios enviar un error
+        //Caso contrario ejecutar el proceso
         if ( this.binarySeed.length() <= 0 ) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Necesitas ingresar una semilla."));
         }
@@ -153,6 +213,10 @@ public class LfsrController implements Serializable {
         this.makeProcess(true);
     }
     
+    /**
+    * Se hace el proceso del lfsr
+    * Y se asignan las variables para ser desplegado en la vista
+    */
     private void makeProcess(boolean b) {
         this.steps = new ArrayList<Step>();
         this.stepIndex = -1;
@@ -164,6 +228,11 @@ public class LfsrController implements Serializable {
         this.endProcess = true;
     }
     
+    /*
+    * Vuelve a dibujar el grafo con la diferencia de que
+    * ahora se muestra una fila con el resultado para poder simular 
+    * y ver el corrimiento en cada step
+    */
     private void initModel2() {
         
         
@@ -298,6 +367,11 @@ public class LfsrController implements Serializable {
         
     }
     
+    /*
+    * Usado para que al redibujar
+    * padamos tener conocimiento de los taps seleccionados
+    * y conectarlos nuevamente
+    */
     private void addPreviousConnections() {
         for(int i : this.connections) {
             Element a = this.model.getElements().get(i);
@@ -374,6 +448,9 @@ public class LfsrController implements Serializable {
         this.model = model;
     }
     
+    /**
+    * Crea un nuevo nodo en forma de circulo
+    */
     private EndPoint createDotEndPoint(EndPointAnchor anchor, boolean source) {
         DotEndPoint endPoint = new DotEndPoint(anchor);
         endPoint.setMaxConnections(1);
@@ -384,6 +461,9 @@ public class LfsrController implements Serializable {
         return endPoint;
     }
 
+    /**
+    * Crea un nuevo nodo en forma de rectangulo
+    */
     private EndPoint createRectangleEndPoint(EndPointAnchor anchor, boolean source) {
         RectangleEndPoint endPoint = new RectangleEndPoint(anchor);
         endPoint.setMaxConnections(1);
@@ -396,6 +476,10 @@ public class LfsrController implements Serializable {
         return endPoint;
     }
     
+    /**
+    * Crea un nuevo nodo en forma de rectangulo, usado para que 
+    * cree nodos que solo reciban y no puedan sacar conexiones
+    */
     private EndPoint createRectangleEndPoint2(EndPointAnchor anchor, boolean source) {
         RectangleEndPoint endPoint = new RectangleEndPoint(anchor);
         endPoint.setMaxConnections(0);
@@ -408,6 +492,10 @@ public class LfsrController implements Serializable {
         return endPoint;
     }
     
+    
+    /**
+    * Se manda a llamar cuando conectamos un tap
+    */
     public void onConnect(ConnectEvent event) {
         
         int len = this.binarySeed.length() - 1;
@@ -418,6 +506,9 @@ public class LfsrController implements Serializable {
         
     }
     
+    /**
+    * Se manda a llamar cuando desconectamos un tap
+    */    
     public void onDisconnect(DisconnectEvent event) {
         int position = Integer.parseInt(event.getSourceElement().getId());
         this.connections.remove(new Integer(position));
@@ -437,6 +528,11 @@ public class LfsrController implements Serializable {
         this.endProcess = endProcess;
     }
     
+    /**
+    * Durante el despliegue de resultados
+    * se activa cuando se da click en el botón anterior
+    * y dibuja el grafo con el corrimiento anterior al actual
+    */
     public void anterior() {
         this.stepIndex--;
         if ( this.stepIndex < 0 ) {
@@ -445,6 +541,11 @@ public class LfsrController implements Serializable {
         this.initModel2();
     }
     
+    /**
+    * Durante el despliegue de resultados
+    * se activa cuando se da click en el botón anterior
+    * y dibuja el grafo con el corrimiento siguiente al actual
+    */
     public void siguiente() {
         this.stepIndex++;
         if ( this.stepIndex >= this.steps.size() ) {
@@ -453,6 +554,10 @@ public class LfsrController implements Serializable {
         this.initModel2();
     }
     
+    /**
+    * Vuelve a resetear todos los parámetros
+    * para la simulación
+    */
     public void reset() {
         this.lfsr.resetTaps();
         this.tapsAsString();
@@ -465,6 +570,9 @@ public class LfsrController implements Serializable {
         this.tapsAsString();
     }
     
+    /**
+    * Método auxiliar de debug
+    */
     public String tapsAsString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[ ");
