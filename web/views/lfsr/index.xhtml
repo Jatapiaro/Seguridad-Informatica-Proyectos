@@ -124,7 +124,7 @@
                 </p:panelGrid>
             </p:panel>
             <p:panel header="Resultados">
-                <p:dataTable id="results" var="step" value="#{lfsrController.lfsr.stepList}" rowIndexVar="i" paginator="true" rowsPerPageTemplate="#{lfsrController.rowsPerTemplate}">
+                <p:dataTable id="results" var="step" value="#{lfsrController.steps}" rowIndexVar="i" paginator="true" rowsPerPageTemplate="#{lfsrController.rowsPerTemplate}">
                     <p:column headerText="#">
                         <h:outputText value="#{i}"/>
                     </p:column>

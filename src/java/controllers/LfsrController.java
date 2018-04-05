@@ -47,6 +47,13 @@ import org.primefaces.model.diagram.endpoint.RectangleEndPoint;
 @ManagedBean
 public class LfsrController implements Serializable {
 
+    /**
+     * @return the steps
+     */
+    public List<Step> getSteps() {
+        return steps;
+    }
+
     /*
     * @param String binarySeed la semilla en binario
     * @param long seed la semilla representada como un entero, se representó con un long
@@ -236,7 +243,7 @@ public class LfsrController implements Serializable {
     private void initModel2() {
         
         
-        Step stepO = this.steps.get(stepIndex);
+        Step stepO = this.getSteps().get(stepIndex);
         
         this.model = new DefaultDiagramModel();
         this.model.setMaxConnections(1000);
@@ -548,8 +555,8 @@ public class LfsrController implements Serializable {
     */
     public void siguiente() {
         this.stepIndex++;
-        if ( this.stepIndex >= this.steps.size() ) {
-            this.stepIndex = this.steps.size()-1;
+        if ( this.stepIndex >= this.getSteps().size() ) {
+            this.stepIndex = this.getSteps().size()-1;
         }
         this.initModel2();
     }
@@ -560,6 +567,7 @@ public class LfsrController implements Serializable {
     */
     public void reset() {
         this.lfsr.resetTaps();
+        this.steps = new ArrayList<Step>();
         this.tapsAsString();
         this.endProcess = false;
         this.connections = new ArrayList<Integer>();
